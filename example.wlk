@@ -12,7 +12,7 @@ class Persona{
   
   method explotaEmocionalmente()=emociones.all{emocion=>emocion.puedeLiberarse(eventos.any())}
   
-  method vivirEvento(evento) = emociones.forEach({emocion=>emocion.liberar(evento)})
+  method vivirEvento(evento) = emociones.map({emocion=>emocion.liberar(evento)})
   
 }
 
@@ -63,14 +63,7 @@ class Emocion{
 
 //Emociones
 object furia inherits Emocion (intensidad=100,eventosVividos=[discutir,resfriado]){
-  /*
-  tiene una serie de palabrotas se se aprenden y olvidan 
-
-  puede liberarse si tiene intensidad elevada y si conoce al menos un apalabrota con mas de 7 letras
-  su intensidad inicial es de 100 pero puede variar 
-
-  cuando se libera disminuirintensidad en impacto . y olvida la primer palabrota
-  */
+ 
 
   const palabrotas=[]
 
@@ -85,7 +78,7 @@ object furia inherits Emocion (intensidad=100,eventosVividos=[discutir,resfriado
 
   method liberar(evento) {
     if(self.puedeLiberarse(evento) && self.esEventoLiberador(evento)) {
-      intensidad -= evento.impacto()//Revisar descuento de intensidad
+      intensidad -= evento.impacto()
       self.olvidarPalabrota()
       experimentaron+=1
     }
@@ -96,11 +89,6 @@ object furia inherits Emocion (intensidad=100,eventosVividos=[discutir,resfriado
   
 }
 object alegria inherits Emocion(eventosVividos=[ganarPremio],intensidadMax=400){
-  //le mpaso evento y disminuye intensidad
-  //No pude tener intensidad negativo (mismo valor pero positivo)
-  // es liberada con intensidad elevada y cantidad de eventos vividos par 
-
-
  
   method liberar(evento) {
     if(self.puedeLiberarse(evento)){
@@ -121,12 +109,6 @@ object alegria inherits Emocion(eventosVividos=[ganarPremio],intensidadMax=400){
 
 
 object tristeza inherits Emocion(eventosVividos=[desaprobarParcial],intensidadMax=250){
-  /*
-  intensidad sin limiacion
-  puede liberarse con melancolia  o otro evento y su intensidad elevada
-  disminuir la intensidad en unidades de impacto
-  se registra la descripcion del evento
-  */
 
   var causa=[]
   method liberar(evento) { 
@@ -145,10 +127,7 @@ object tristeza inherits Emocion(eventosVividos=[desaprobarParcial],intensidadMa
   
 }
 class DesagradoTemor inherits Emocion{
-   /*
-  Intensidad elevada y cantidad de eventos es mayor que intensidad
-  liberar implica disminuir la intensida en impacto
-  */
+  
   method liberar(evento) {
    if(self.puedeLiberarse(evento)){
     intensidad-=evento.intensidad()
@@ -169,6 +148,40 @@ const juan =new Persona (edad=17)
 const pedro =new Persona(edad=15)
 const manuel =new Persona(edad=12)
 
-object grupo {
-  var property itegrantes = [juan,pedro,manuel] 
+class Grupo {
+  var property integrantes = [juan,pedro,manuel] 
+  
+  method aplicarEvento(evento) {
+    integrantes.all{integrante=>integrante.aplicarEvento(evento)}
+  }
+  }
+
+// **** INTENSAMENTE 2 **********
+
+object ansiedad inherits Emocion(
+  intensidad=500,intensidadMax=1000,
+  eventosVividos=[ganarPremio,resfriado,discutir,desaprobarParcial,melancolia]) {
+   
+   var indice=1
+
+   method liberar(evento) {
+   if(self.puedeLiberarse(evento)){
+    intensidad-=(evento.intensidad() * indice)
+    indice +=1
+    experimentaron+=1}
+  }
+
+  method puedeLiberarse(evento)=self.esEventoLiberador(evento) || (self.intencidadElevada()&& self.eventosVividos().size()>3)
+  //Por cada evento que lo libera aumenta el indice y por lo tanto modifica de forma màs abrupta a la intensidad
 }
+
+
+/*
+Los conceptos de polimorfismo nos fueron utiles para que caba objeto de una misma clase
+entienda los mismos mensajes y asi hacer el codigo màs funcional ya que es generico,al agregar otro elemento con 
+otros atributos pero que respete el polimirfismo no se cambiaria el codigo. 
+Y en el caso de herencia me aseguro que los objetos que tengan los mismos datos esten vinculados
+a una clase de la cual heredan estos atributos y pueden tener otros independientes de resto de los de la clase.
+
+
+*/
