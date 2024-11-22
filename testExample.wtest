@@ -1,9 +1,12 @@
-import example.pepita
+import example.*
 
-describe "group of tests for pepita" {
+test "persona con ansiedad" {
+  juan.agregarEmocion(ansiedad)
+  juan.agregarEventos(desaprobarParcial)
+  juan.agregarEventos(resfriado)
+  juan.agregarEventos(discutir)
+  juan.vivirEvento(desaprobarParcial)
+  juan.vivirEvento(resfriado)
 
-  test "pepita has initial energy" {
-    assert.equals(100, pepita.energy())
-  }
-
+  assert.equals(430,(juan.emociones().first().intensidad()))
 }
